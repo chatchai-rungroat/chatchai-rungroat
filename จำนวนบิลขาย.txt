@@ -1,0 +1,145 @@
+SELECT        YEAR(SALESDATE) AS Expr1, MONTH(SALESDATE) AS Expr2, CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2.500-1000' ELSE '3.>1000' END AS Expr4, COUNT(DOCNO) AS Expr3
+FROM            dbo.POSTRNHD
+WHERE        (DOCNO LIKE '1%')
+GROUP BY YEAR(SALESDATE), MONTH(SALESDATE), CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2.500-1000' ELSE '3.>1000' END
+HAVING        (YEAR(SALESDATE) = 2019)
+
+
+SELECT        YEAR(dbo.OrderConfirmationMaster.Order_Confirmation_Date) AS year, MONTH(dbo.OrderConfirmationMaster.Order_Confirmation_Date) AS month, dbo.PAYMENTMASTER_GROUP.PAYMENTGROUPNAME, 
+                          CASE WHEN Grand_Total_THB <= 500 THEN '0-500' 
+						 WHEN Grand_Total_THB BETWEEN 501 AND 1000 THEN '501-1,000' WHEN Grand_Total_THB BETWEEN 1001 AND 1500 THEN '1,001-1,500' 
+						 WHEN Grand_Total_THB BETWEEN 1501 AND 2000 then '1,501-2,000'  WHEN Grand_Total_THB BETWEEN 2001 AND 2500 THEN '2,001-2,500' 
+						 WHEN Grand_Total_THB BETWEEN 2501 AND 3000 THEN '2,501-3,000' WHEN Grand_Total_THB BETWEEN 3001 AND 3500 THEN '3,001-3,500' 
+						 WHEN Grand_Total_THB BETWEEN 3501 AND 4000 THEN '3,501-4,000' ELSE '> 4,000'  END AS salerank,sum( Grand_Total_THB) as amount ,count(Order_Confirmation_No) as countbill
+FROM            dbo.OrderConfirmationMaster INNER JOIN
+                         dbo.PaymentMaster ON dbo.OrderConfirmationMaster.Payment_Method = dbo.PaymentMaster.Payment_Method INNER JOIN
+                         dbo.PAYMENTMASTER_GROUP ON dbo.PaymentMaster.PAYMENTGROUPID = dbo.PAYMENTMASTER_GROUP.PAYMENTGROUPID
+WHERE        (dbo.OrderConfirmationMaster.Status <> 'C') AND (dbo.OrderConfirmationMaster.Order_Confirmation_Date BETWEEN CONVERT(DATETIME, '2022-01-01 00:00:00', 102) AND CONVERT(DATETIME, '2022-12-31 00:00:00', 102))
+group by YEAR(dbo.OrderConfirmationMaster.Order_Confirmation_Date), MONTH(dbo.OrderConfirmationMaster.Order_Confirmation_Date) , dbo.PAYMENTMASTER_GROUP.PAYMENTGROUPNAME, 
+                          CASE WHEN Grand_Total_THB <= 500 THEN '0-500' 
+						 WHEN Grand_Total_THB BETWEEN 501 AND 1000 THEN '501-1,000' WHEN Grand_Total_THB BETWEEN 1001 AND 1500 THEN '1,001-1,500' 
+						 WHEN Grand_Total_THB BETWEEN 1501 AND 2000 then '1,501-2,000'  WHEN Grand_Total_THB BETWEEN 2001 AND 2500 THEN '2,001-2,500' 
+						 WHEN Grand_Total_THB BETWEEN 2501 AND 3000 THEN '2,501-3,000' WHEN Grand_Total_THB BETWEEN 3001 AND 3500 THEN '3,001-3,500' 
+						 WHEN Grand_Total_THB BETWEEN 3501 AND 4000 THEN '3,501-4,000' ELSE '> 4,000'  END
+
+
+SELECT        YEAR(SALESDATE) AS Expr1, MONTH(SALESDATE) AS Expr2, 
+CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2. 500-1000'
+     WHEN nettotal < 2000 THEN '3. 1000-2000'
+	 WHEN nettotal < 3000 THEN '4. 2000-3000'
+	 WHEN nettotal < 1000 THEN '5. 3000-4000'
+     ELSE '6. >4000' END AS Expr4,
+ COUNT(DOCNO) AS Expr3
+FROM            dbo.POSTRNHD
+WHERE        (DOCNO LIKE '1%') and 
+   (YEAR(SALESDATE) = 2019)
+GROUP BY YEAR(SALESDATE), MONTH(SALESDATE), 
+CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2. 500-1000'
+     WHEN nettotal < 2000 THEN '3. 1000-2000'
+	 WHEN nettotal < 3000 THEN '4. 2000-3000'
+	 WHEN nettotal < 1000 THEN '5. 3000-4000'
+     ELSE '6. >4000' END 
+
+
+	SELECT        YEAR(SALESDATE) AS Expr1, MONTH(SALESDATE) AS Expr2, 
+CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2. 501-1000'
+     else  '3. > 1000'
+ END AS Expr4,
+ COUNT(DOCNO) AS Expr3
+FROM            dbo.POSTRNHD
+WHERE        (DOCNO LIKE '1%') and 
+   (YEAR(SALESDATE) = 2019)
+GROUP BY YEAR(SALESDATE), MONTH(SALESDATE), 
+CASE WHEN NETTOTAL < 500 THEN '1.< 500' WHEN nettotal < 1000 THEN '2. 501-1000'
+     else '3. > 1000'
+ END
+
+
+
+use pos
+
+SELECT        YEAR(SALESDATE) AS Year, MONTH(SALESDATE) AS Month, 
+CASE     WHEN NETTOTAL < 500 THEN '1.< 500' 
+	 WHEN nettotal < 1000 THEN '2. 501-1000'
+	 WHEN nettotal < 1500 THEN '3. 1001-1500'
+         WHEN nettotal < 2000 THEN '4. 1501-2000'
+	 WHEN nettotal < 2500 THEN '5. 2001-2500'
+	 WHEN nettotal < 3000 THEN '6. 2501-3000'
+	 WHEN nettotal < 3500 THEN '7. 3001-3500'
+	 WHEN nettotal < 4000 THEN '8. 3501-4000'
+     ELSE '9. >4000' END AS Step,
+ COUNT(DOCNO) AS CountBill,sum(nettotal) as Total
+FROM            dbo.POSTRNHD
+WHERE        (DOCNO LIKE '1%') and 
+   SALESDATE >= '2020-06-01'
+GROUP BY YEAR(SALESDATE), MONTH(SALESDATE), 
+CASE WHEN NETTOTAL < 500 THEN '1.< 500' 
+	 WHEN nettotal < 1000 THEN '2. 501-1000'
+	 WHEN nettotal < 1500 THEN '3. 1001-1500'
+     WHEN nettotal < 2000 THEN '4. 1501-2000'
+	 WHEN nettotal < 2500 THEN '5. 2001-2500'
+	 WHEN nettotal < 3000 THEN '6. 2501-3000'
+	 WHEN nettotal < 3500 THEN '7. 3001-3500'
+     WHEN nettotal < 4000 THEN '8. 3501-4000'
+     ELSE '9. >4000' END 
+	 order by YEAR(SALESDATE), MONTH(SALESDATE),step
+
+SELECT        YEAR(SALESDATE) AS Year, MONTH(SALESDATE) AS Month, 
+CASE     WHEN NETTOTAL < 500 THEN '1.< 500' 
+	 WHEN nettotal < 800 THEN '2. 501-799'
+	 WHEN nettotal < 1199 THEN '3. 800-1199'
+     ELSE '9. > 1199' END AS Step,
+ COUNT(DOCNO) AS CountBill,sum(nettotal) as Total
+FROM            dbo.POSTRNHD
+WHERE        (DOCNO LIKE '1%') and 
+   SALESDATE between '2021-01-01' and '2021-01-15' 
+GROUP BY YEAR(SALESDATE), MONTH(SALESDATE), 
+CASE     WHEN NETTOTAL < 500 THEN '1.< 500' 
+	 WHEN nettotal < 800 THEN '2. 501-799'
+	 WHEN nettotal < 1199 THEN '3. 800-1199'
+     ELSE '9. > 1199' END  
+	 order by YEAR(SALESDATE), MONTH(SALESDATE),step
+
+SELECT        dbo.v_possales_DOCNO.SHORTNAME, year( dbo.v_possales_DOCNO.SALESDATE), month( dbo.v_possales_DOCNO.SALESDATE),
+case when dbo.v_possales_DOCNO.NETTOTAL < 500 then '< 500'
+     when dbo.v_possales_DOCNO.nettotal< 800 THEN '2. 500-799'
+	 when dbo.v_possales_DOCNO.nettotal < 1199 THEN '3. 800-1199'
+	 else '4. > 1199' END AS Step,  count(distinct( dbo.v_possales_DOCNO.DOCNO))
+FROM            v_possales_DOCNO
+where        (dbo.v_possales_DOCNO.SALESDATE BETWEEN CONVERT(DATETIME, '2020-12-01 00:00:00', 102) AND CONVERT(DATETIME, '2020-12-24 00:00:00', 102)) 
+GROUP BY dbo.v_possales_DOCNO.SHORTNAME,  dbo.v_possales_DOCNO.SHORTNAME,
+ year( dbo.v_possales_DOCNO.SALESDATE), month( dbo.v_possales_DOCNO.SALESDATE),
+case when dbo.v_possales_DOCNO.NETTOTAL < 500 then '< 500'
+     when dbo.v_possales_DOCNO.nettotal< 800 THEN '2. 500-799'
+	 when dbo.v_possales_DOCNO.nettotal < 1199 THEN '3. 800-1199'
+	 else '4. > 1199' END
+
+
+
+---------
+
+
+SELECT        TOP (100) PERCENT YEAR(dbo.POSTRNHD.SALESDATE) AS Year, MONTH(dbo.POSTRNHD.SALESDATE) AS Month, 
+                         CASE WHEN NETTOTAL < 800 THEN '1.< 800' WHEN nettotal < 1000 THEN '2. 801-1000' WHEN nettotal < 1500 THEN '3. 1001-1500' WHEN nettotal < 2000 THEN '4. 1501-2000' WHEN nettotal < 2500 THEN '5. 2001-2500' WHEN nettotal
+                          < 3000 THEN '6. 2501-3000' WHEN nettotal < 3500 THEN '7. 3001-3500' WHEN nettotal < 4000 THEN '8. 3501-4000' ELSE '9. >4000' END AS Step, COUNT(dbo.POSTRNHD.DOCNO) AS CountBill, 
+                         SUM(dbo.POSTRNHD.NETTOTAL) AS Total, SabinaSales.dbo.v_linetree.N_WAREHOUSE
+FROM            dbo.POSTRNHD INNER JOIN
+                         dbo.POSSTATION ON dbo.POSTRNHD.POSID = dbo.POSSTATION.POSID INNER JOIN
+                         dbo.CUSTOMER ON dbo.POSSTATION.CUSTOMERID = dbo.CUSTOMER.CUSTOMERID INNER JOIN
+                         SabinaSales.dbo.v_linetree ON dbo.CUSTOMER.N_LINE = SabinaSales.dbo.v_linetree.N_LINE
+WHERE        (dbo.POSTRNHD.DOCNO LIKE '1%') AND (dbo.POSTRNHD.SALESDATE between  '2020-08-01' and '2020-08-31' )
+GROUP BY YEAR(dbo.POSTRNHD.SALESDATE), MONTH(dbo.POSTRNHD.SALESDATE), 
+                         CASE WHEN NETTOTAL < 800 THEN '1.< 800' WHEN nettotal < 1000 THEN '2. 801-1000' WHEN nettotal < 1500 THEN '3. 1001-1500' WHEN nettotal < 2000 THEN '4. 1501-2000' WHEN nettotal < 2500 THEN '5. 2001-2500' WHEN nettotal
+                          < 3000 THEN '6. 2501-3000' WHEN nettotal < 3500 THEN '7. 3001-3500' WHEN nettotal < 4000 THEN '8. 3501-4000' ELSE '9. >4000' END, SabinaSales.dbo.v_linetree.N_WAREHOUSE
+ORDER BY Year, Month, step
+
+---------------------- ข้อมูลขายตามแสดงช่วงเวลา
+SELECT        dbo.CUSTOMER.SHORTNAME, dbo.CUSTOMER.LOCATION, dbo.CUSTOMER.CUSTOMERID, dbo.CUSTOMER.n_line, dbo.POSTRNHD.SALESDATE, SUBSTRING(dbo.POSTRNHD.SALESTIME, 1, 2) AS SALETIME, 
+                         COUNT(dbo.POSTRNHD.DOCNO) AS COUNTBILL, SUM(dbo.POSTRNHD.NETTOTAL) AS NETTOTAL
+FROM            dbo.POSTRNHD INNER JOIN
+                         dbo.POSSTATION ON dbo.POSTRNHD.POSID = dbo.POSSTATION.POSID INNER JOIN
+                         dbo.CUSTOMER ON dbo.POSSTATION.CUSTOMERID = dbo.CUSTOMER.CUSTOMERID
+WHERE        (dbo.POSTRNHD.REFUNDUSED = 'N')
+GROUP BY dbo.CUSTOMER.SHORTNAME, dbo.CUSTOMER.LOCATION, dbo.CUSTOMER.CUSTOMERID, dbo.CUSTOMER.n_line, dbo.POSTRNHD.SALESDATE, SUBSTRING(dbo.POSTRNHD.SALESTIME, 1, 2)
+HAVING        (dbo.POSTRNHD.SALESDATE BETWEEN CONVERT(DATETIME, '2020-12-26 00:00:00', 102) AND CONVERT(DATETIME, '2020-12-27 00:00:00', 102))
+    
